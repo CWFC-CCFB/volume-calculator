@@ -1,4 +1,4 @@
-#' volume by Taper equations
+#' Wood volume calculation using taper models
 #'
 #' Description
 #'
@@ -25,6 +25,8 @@
 #' V_EstH.R <- volTaper(data = sample_data, measuredH = FALSE, limit.dob = 9, limit.height = NULL)
 
 #' @export
+#' @author XiaoJing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
+#' @references Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224
 volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = NULL){
   canfi <- dob2P_pre <- Vi <- dob2P <- NULL
   treeID <- c <- dbh_cm <- h <- cf <- Dob2P0 <- NULL

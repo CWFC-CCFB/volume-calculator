@@ -2,7 +2,7 @@
 % Please edit documentation in R/volTaper.R
 \name{volTaper}
 \alias{volTaper}
-\title{volume by Taper equations}
+\title{Wood volume calculation using taper models}
 \usage{
 volTaper(data, measuredH = TRUE, limit.dob = NULL, limit.height = NULL)
 }
@@ -30,4 +30,10 @@ sample_data <- data.table::data.table(
 )
 V_ObsH.R <- volTaper(data = sample_data, measuredH = TRUE, limit.dob = 9, limit.height = NULL)
 V_EstH.R <- volTaper(data = sample_data, measuredH = FALSE, limit.dob = 9, limit.height = NULL)
+}
+\references{
+Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224
+}
+\author{
+XiaoJing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
 }
