@@ -7,7 +7,7 @@
 volTaper(data, measuredH = TRUE, limit.dob = NULL, limit.height = NULL)
 }
 \arguments{
-\item{data}{a data frame that includes at least 4 columns: canfi, treeID, dbh_cm, Htot_m}
+\item{data}{a data frame that includes at least 4 columns: species_code, treeID, dbh_cm, Htot_m}
 
 \item{measuredH}{logic, TRUE if Htot is available .}
 
@@ -23,7 +23,7 @@ details
 }
 \examples{
 sample_data <- data.table::data.table(
-  canfi = c(101,102),
+  species_code = c("PICEMAR","PICEGLA"),
   treeID = c(1,2),
   dbh_cm = c(30,30),
   Htot_m = c(18,18)
@@ -35,5 +35,5 @@ V_EstH.R <- volTaper(data = sample_data, measuredH = FALSE, limit.dob = 9, limit
 Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224
 }
 \author{
-XiaoJing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
+Xiao Jing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
 }

@@ -2,9 +2,7 @@
 #'
 #' @format a data table
 #' \describe{
-#' \item{Hchoice}{obs or est}
-#' \item{name_eng}{english name}
-#' \item{CANFI_code}{canfi code}
+#' \item{species_code}{combination of the 4-letter genus code and 3-letter species code (NFI_CODE)}
 #' \item{a1}{fixed effect a1}
 #' \item{a2}{fixed effect a2}
 #' \item{b}{fixed effect b}
@@ -16,4 +14,4 @@
 #' \item{sddev_Residual}{sd of residuals}
 #' }
 #'
-"tab6.EstH"
+"Parms.EstH"

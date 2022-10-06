@@ -1,0 +1,35 @@
+species_code,ENGLISH_NAME,FRENCH_NAME,SCIENTIFIC_NAME
+PICEMAR,Black spruce,Épinette noire,Picea mariana (Mill.) B.S.P.
+PICERUB,Red spruce,Épinette rouge,Picea rubens Sarg.
+PICEENG,Engelmann spruce,Épinette d’engelmann,Picea engelmannii Parry
+PICEGLA,White spruce,Épinette blanche,Picea glauca (Moench) Voss
+PINUSTR,Eastern white pine,Pin blanc,Pinus strobus L.
+PINUBAN,Jack pine,Pin gris,Pinus banksiana Lamb.
+PINUCON,Lodgepole pine,Pin lodgepole,Pinus contorta var. latifolia Engelm.
+PINURES,Red pine,Pin rouge,Pinus resinosa Ait.
+ABIEBAL,Balsam fir,Sapin baumier,Abies balsamea (L.) Mill.
+ABIELAS,Alpine fir,Sapin subalpin,Abies lasiocarpa (Hook.) Nutt.
+TSUGCAN,Eastern hemlock,Pruche du Canada,Tsuga canadensis (L.) Carr.
+PSEUMEN,Douglas-fir,Douglas vert,Pseudotsuga menziesii  var. menziesii (Mirb.) Franco
+LARILAR,Tamarack larch,Mélèze laricin,Larix laricina (Du Roi) K. Koch
+THUJOCC,Eastern white cedar,Thuya occidental,Thuja occidentalis L.
+POPUTRE,Trembling aspen,Peuplier faux-tremble,Populus tremuloides Michx.
+POPUBAL,Balsam poplar,Peuplier baumier,Populus balsamifera L.
+POPUGRA,Largetooth aspen,Peuplier à grandes dents,Populus grandidentata Michx.
+POPUNIG,Black poplar,Peuplier noir,Populus nigra
+BETUALL,Yellow birch,Bouleau jaune,Betula alleghaniensis Britton (Betula lutea Michx. F.)
+BETUPAP,White birch,Bouleau à papier,Betula papyrifera Marsh.
+ACERSAH,Sugar maple,Érable à sucre,Acer saccharum Marsh.
+ACERNEG,Manitoba maple,Érable à Giguère,Acer negundo L.
+ACERRUB,Red maple,Érable rouge,Acer rubrum L.
+ACERSAC,Silver maple,Érable argenté,Acer saccharinum L.
+CARYSPP,Hickory,Caryer,Carya Nutt.
+FAGUGRA,Beech,Hêtre à grandes feuilles,Fagus grandifolia Ehrh.
+QUERALB,White oak,Chêne blanc,Quercus alba L.
+QUERRUB,Red oak,Chêne rouge,Quercus rubra L.
+ULMUAME,White elm,Orme d’Amérique,Ulmus americana L.
+PRUNSER,Black cherry,Cerisier tardif,Prunus serotina Ehrh.
+TILIAME,Basswood,Tilleul d’Amérique,Tilia americana L.
+FRAXAME,White ash,Frêne blanc,Fraxinus americana L.
+FRAXNIG,Black ash,Frêne noir,Fraxinus nigra Marsh.
+FRAXPEN,Red ash,Frêne rouge,Fraxinus pennsylvanica Marsh.

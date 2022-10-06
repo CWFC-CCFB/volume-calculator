@@ -4,9 +4,7 @@
 #'
 #' @format a data table
 #' \describe{
-#' \item{Hchoice}{obs or est}
-#' \item{name_eng}{english name}
-#' \item{CANFI_code}{canfi code}
+#' \item{species_code}{combination of the 4-letter genus code and 3-letter species code (NFI_CODE)}
 #' \item{fixed_b}{fixed effect}
 #' \item{stddev_prov_b}{sd of random effect prov}
 #' \item{stddev_idPlot_b}{sd of random effect idplot}
@@ -16,5 +14,5 @@
 #'
 #' @keywords datasets
 #' @examples
-#' data(tab4.ObsH)
-"tab4.ObsH"
+#' data(Parms.ObsH)
+"Parms.ObsH"

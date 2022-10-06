@@ -4,7 +4,7 @@
 #'
 #' details
 #'
-#' @param data a data frame that includes at least 4 columns: canfi, treeID, dbh_cm, Htot_m
+#' @param data a data frame that includes at least 4 columns: species_code, treeID, dbh_cm, Htot_m
 #' @param measuredH logic, TRUE if Htot is available .
 #' @param limit.dob numeric, the limit of dob (cm) .
 #' @param limit.height numeric, the limit of height (m) .
@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' sample_data <- data.table::data.table(
-#'   canfi = c(101,102),
+#'   species_code = c("PICEMAR","PICEGLA"),
 #'   treeID = c(1,2),
 #'   dbh_cm = c(30,30),
 #'   Htot_m = c(18,18)
@@ -25,10 +25,11 @@
 #' V_EstH.R <- volTaper(data = sample_data, measuredH = FALSE, limit.dob = 9, limit.height = NULL)
 
 #' @export
-#' @author XiaoJing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
+#'
+#' @author Xiao Jing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
 #' @references Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224
 volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = NULL){
-  canfi <- dob2P_pre <- Vi <- dob2P <- NULL
+  species_code <- dob2P_pre <- Vi <- dob2P <- NULL
   treeID <- c <- dbh_cm <- h <- cf <- Dob2P0 <- NULL
   if (measuredH == TRUE){
     var_b <- Der2_b <- NULL
@@ -37,11 +38,11 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
     # expand the data
     df <- data %>%
       rowwise() %>%
-      transmute(canfi,treeID, dbh_cm, Htot_m, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
+      transmute(species_code,treeID, dbh_cm, Htot_m, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
       unnest_longer(h)
-    tab4.ObsH <- data.table::data.table(tab4.ObsH)
-    tab4.ObsH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
-    df2 <- setDT(df)[tab4.ObsH [, c("CANFI_code", "fixed_b", "var_b")], on = c(canfi = "CANFI_code"), nomatch = 0]
+    Parms.ObsH <- data.table::data.table(Parms.ObsH)
+    Parms.ObsH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
+    df2 <- setDT(df)[Parms.ObsH [, c("species_code", "fixed_b", "var_b")], on = c("species_code"), nomatch = 0]
 
     df2 [, c:= (Htot_m - h)/(Htot_m - 1.3)]
 
@@ -53,21 +54,21 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
     df2[  , dob2P := Dob2P0+cf]
 
   }else{
-    # data(tab6.EstH)
+    # data(Parms.EstH)
     var_b <- var_a2 <- Htot_m <- Der2_b <- Der2_a2 <- NULL
     stddev_prov_b <- stddev_idPlot_b <- stddev_idtree_b <- stddev_prov_a2 <- stddev_idPlot_a2 <- a1 <- a2 <- b <- NULL
 
-    tab6.EstH <- data.table::data.table(tab6.EstH)
-    tab6.EstH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
-    tab6.EstH[,var_a2 := stddev_prov_a2^2 + stddev_idPlot_a2^2 ]
+    Parms.EstH <- data.table::data.table(Parms.EstH)
+    Parms.EstH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
+    Parms.EstH[,var_a2 := stddev_prov_a2^2 + stddev_idPlot_a2^2 ]
 
-    df <- data[tab6.EstH [, c("CANFI_code", "a1", "a2", "b" , "var_a2", "var_b")], on = c(canfi = "CANFI_code"), nomatch = 0]
+    df <- data[Parms.EstH [, c("species_code", "a1", "a2", "b" , "var_a2", "var_b")], on = c("species_code"), nomatch = 0]
 
     df[, Htot_m := round(a1*dbh_cm^a2, 1)]
 
     df2 <- df %>%
       rowwise() %>%
-      transmute(canfi,treeID, dbh_cm, Htot_m, a1,a2,b,var_a2,var_b, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
+      transmute(species_code,treeID, dbh_cm, Htot_m, a1,a2,b,var_a2,var_b, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
       unnest_longer(h)
 
 
@@ -82,11 +83,11 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
   }
 
 
-  df2 <- df2[, c("canfi", "treeID", "h", "dob2P")]
+  df2 <- df2[, c("species_code", "treeID", "h", "dob2P")]
 
   # volume
-  setorder(df2, canfi, treeID, h)
-  df2[, dob2P_pre:= shift(dob2P), by = .(canfi, treeID)]
+  setorder(df2, species_code, treeID, h)
+  df2[, dob2P_pre:= shift(dob2P), by = .(species_code, treeID)]
 
   # h criteria
   if(!(is.null(limit.height))) df2 <- df2[h <= limit.height]
@@ -95,13 +96,13 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
 
   df2 <- df2[!is.na(dob2P_pre)]
   df2[, Vi := (dob2P + dob2P_pre)*0.1*acos(0)*2/80000]
-  v_tree <- df2[, .(Vol_m3 = sum(Vi)), by = .(canfi, treeID)]
+  v_tree <- df2[, .(Vol_m3 = sum(Vi)), by = .(species_code, treeID)]
   if (measuredH == TRUE) equation <- "Hobs" else equation <- "Hest"
   # setnames(v_tree, "Vol_m3", paste0("vol_", equation))
   if (is.null(limit.dob)) limit.dob <- NA_real_
   if (is.null(limit.height)) limit.height <- NA_real_
   v_tree[, c("limit.dob", "limit.height", "Equation") := .(limit.dob, limit.height, equation)]
-  data.v <- data[v_tree, on = .(canfi, treeID)]
+  data.v <- data[v_tree, on = .(species_code, treeID)]
   return(data.v)
 }
 
