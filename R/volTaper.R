@@ -1,6 +1,6 @@
 #' Wood volume calculation using taper models
 #'
-#' Description
+#' Wood volume calculation using taper models
 #'
 #' details
 #'
@@ -41,6 +41,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
       transmute(species_code,treeID, dbh_cm, Htot_m, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
       unnest_longer(h)
     Parms.ObsH <- data.table::data.table(Parms.ObsH)
+    Parms.ObsH[is.na(Parms.ObsH)] <- 0
     Parms.ObsH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
     df2 <- setDT(df)[Parms.ObsH [, c("species_code", "fixed_b", "var_b")], on = c("species_code"), nomatch = 0]
 
@@ -59,6 +60,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
     stddev_prov_b <- stddev_idPlot_b <- stddev_idtree_b <- stddev_prov_a2 <- stddev_idPlot_a2 <- a1 <- a2 <- b <- NULL
 
     Parms.EstH <- data.table::data.table(Parms.EstH)
+    Parms.EstH[is.na(Parms.EstH)] <- 0
     Parms.EstH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
     Parms.EstH[,var_a2 := stddev_prov_a2^2 + stddev_idPlot_a2^2 ]
 
@@ -97,7 +99,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
   df2 <- df2[!is.na(dob2P_pre)]
   df2[, Vi := (dob2P + dob2P_pre)*0.1*acos(0)*2/80000]
   v_tree <- df2[, .(Vol_m3 = sum(Vi)), by = .(species_code, treeID)]
-  if (measuredH == TRUE) equation <- "Hobs" else equation <- "Hest"
+  if (measuredH == TRUE) equation <- "ObsH" else equation <- "EstH"
   # setnames(v_tree, "Vol_m3", paste0("vol_", equation))
   if (is.null(limit.dob)) limit.dob <- NA_real_
   if (is.null(limit.height)) limit.height <- NA_real_

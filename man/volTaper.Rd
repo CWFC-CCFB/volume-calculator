@@ -16,7 +16,7 @@ volTaper(data, measuredH = TRUE, limit.dob = NULL, limit.height = NULL)
 \item{limit.height}{numeric, the limit of height (m) .}
 }
 \description{
-Description
+Wood volume calculation using taper models
 }
 \details{
 details
