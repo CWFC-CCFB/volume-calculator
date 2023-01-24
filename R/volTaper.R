@@ -29,7 +29,7 @@
 #' @author Xiao Jing Guo \email{xiaojing.guo@NRCan-RNCan.gc.ca}
 #' @references Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224
 volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = NULL){
-  species_code <- dob2P_pre <- Vi <- dob2P <- NULL
+  species_code <- dob2P_top <- h_top <- Vi <- dob2P <- NULL
   treeID <- c <- dbh_cm <- h <- cf <- Dob2P0 <- NULL
   if (measuredH == TRUE){
     var_b <- Der2_b <- NULL
@@ -88,16 +88,16 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
   df2 <- df2[, c("species_code", "treeID", "h", "dob2P")]
 
   # volume
-  setorder(df2, species_code, treeID, h)
-  df2[, dob2P_pre:= shift(dob2P), by = .(species_code, treeID)]
-
+  setorder(df2, species_code, treeID, -h)
+  df2[, dob2P_top:= shift(dob2P), by = .(species_code, treeID)]
+  df2[, h_top:= shift(h), by = .(species_code, treeID)]
   # h criteria
-  if(!(is.null(limit.height))) df2 <- df2[h <= limit.height]
+  if(!(is.null(limit.height))) df2 <- df2[h_top <= limit.height]
   # dob criteria
-  if(!is.null(limit.dob)) df2 <- df2[dob2P_pre >= limit.dob^2]
+  if(!is.null(limit.dob)) df2 <- df2[dob2P_top >= limit.dob^2]
 
-  df2 <- df2[!is.na(dob2P_pre)]
-  df2[, Vi := (dob2P + dob2P_pre)*0.1*acos(0)*2/80000]
+  df2 <- df2[!is.na(dob2P_top)]
+  df2[, Vi := (dob2P + dob2P_top)*0.1*acos(0)*2/80000]
   v_tree <- df2[, .(Vol_m3 = sum(Vi)), by = .(species_code, treeID)]
   if (measuredH == TRUE) equation <- "ObsH" else equation <- "EstH"
   # setnames(v_tree, "Vol_m3", paste0("vol_", equation))
