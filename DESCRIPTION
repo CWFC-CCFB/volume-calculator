@@ -15,4 +15,5 @@ LazyData: true
 Imports: 
     data.table,
     dplyr,
-    tidyr
+    tidyr,
+    plyr

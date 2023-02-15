@@ -12,7 +12,9 @@
 #'
 #' @import dplyr
 #' @import tidyr
+#' @importFrom plyr join
 #' @rawNamespace import(data.table, except = c(last, first, between))
+#'
 #'
 #' @examples
 #' sample_data <- data.table::data.table(
@@ -40,7 +42,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
       rowwise() %>%
       transmute(species_code,treeID, dbh_cm, Htot_m, h = list(seq_a(0.1, Htot_m, 0.1))) %>%
       unnest_longer(h)
-    Parms.ObsH <- data.table::data.table(Parms.ObsH)
+    Parms.ObsH <- VolumeTaper::Parms.ObsH
     Parms.ObsH[is.na(Parms.ObsH)] <- 0
     Parms.ObsH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
     df2 <- setDT(df)[Parms.ObsH [, c("species_code", "fixed_b", "var_b")], on = c("species_code"), nomatch = 0]
@@ -59,7 +61,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
     var_b <- var_a2 <- Htot_m <- Der2_b <- Der2_a2 <- NULL
     stddev_prov_b <- stddev_idPlot_b <- stddev_idtree_b <- stddev_prov_a2 <- stddev_idPlot_a2 <- a1 <- a2 <- b <- NULL
 
-    Parms.EstH <- data.table::data.table(Parms.EstH)
+    Parms.EstH <- VolumeTaper::Parms.EstH
     Parms.EstH[is.na(Parms.EstH)] <- 0
     Parms.EstH[,var_b := stddev_prov_b^2 + stddev_idPlot_b^2 + stddev_idtree_b^2 ]
     Parms.EstH[,var_a2 := stddev_prov_a2^2 + stddev_idPlot_a2^2 ]
@@ -104,7 +106,7 @@ volTaper <- function(data , measuredH = TRUE, limit.dob = NULL, limit.height = N
   if (is.null(limit.dob)) limit.dob <- NA_real_
   if (is.null(limit.height)) limit.height <- NA_real_
   v_tree[, c("limit.dob", "limit.height", "Equation") := .(limit.dob, limit.height, equation)]
-  data.v <- data[v_tree, on = .(species_code, treeID)]
+  data.v <- join(data,v_tree, by = c("species_code", "treeID"))
   return(data.v)
 }
 

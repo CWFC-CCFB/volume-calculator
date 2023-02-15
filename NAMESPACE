@@ -3,5 +3,7 @@
 export(volTaper)
 import(data.table, except = c(last, first, between))
 
+
 import(dplyr)
 import(tidyr)
+importFrom(plyr,join)
