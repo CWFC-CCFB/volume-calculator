@@ -18,9 +18,6 @@ volTaper(data, measuredH = TRUE, limit.dob = NULL, limit.height = NULL)
 \description{
 Wood volume calculation using taper models
 }
-\details{
-details
-}
 \examples{
 sample_data <- data.table::data.table(
   species_code = c("PICEMAR","PICEGLA"),
