@@ -4,12 +4,17 @@
 \alias{volTaper}
 \title{Wood volume calculation using taper models}
 \usage{
-volTaper(data, measuredH = TRUE, limit.dob = NULL, limit.height = NULL)
+volTaper(
+  data,
+  forceHeightEstimation = FALSE,
+  limit.dob = NULL,
+  limit.height = NULL
+)
 }
 \arguments{
 \item{data}{a data frame that includes at least 4 columns: species_code, treeID, dbh_cm, Htot_m}
 
-\item{measuredH}{logic, TRUE if Htot is available .}
+\item{forceHeightEstimation}{logic, TRUE to force the height estimation even if Htot is available.}
 
 \item{limit.dob}{numeric, the limit of dob (cm) .}
 
@@ -25,8 +30,8 @@ sample_data <- data.table::data.table(
   dbh_cm = c(30,30),
   Htot_m = c(18,18)
 )
-V_ObsH.R <- volTaper(data = sample_data, measuredH = TRUE, limit.dob = 9, limit.height = NULL)
-V_EstH.R <- volTaper(data = sample_data, measuredH = FALSE, limit.dob = 9, limit.height = NULL)
+V_ObsH.R <- volTaper(data = sample_data, limit.dob = 9, limit.height = NULL)
+V_EstH.R <- volTaper(data = sample_data, forceHeightEstimation = TRUE, limit.dob = 9, limit.height = NULL)
 }
 \references{
 Ung, C.-H.; Guo, X.J.; Fortin, M. 2013. Canadian national taper models. For. Chron. 89(2):211-224

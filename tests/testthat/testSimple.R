@@ -25,3 +25,18 @@ test_that("Testing predictions without observed heights", {
   expect_equal(V_EstH.R$Vol_m3[1], 0.6079802, tolerance = 1E-6)
   expect_equal(V_EstH.R$Vol_m3[2], 0.6741257, tolerance = 1E-6)
 })
+
+speciesList <- getSpeciesList()
+test_that("Testing species list", {
+  expect_equal(nrow(speciesList), 34)
+})
+
+test_that("Testing example for random effect predictions", {
+  expect_equal(nrow(VolumeTaper::exampleRandomEffectPrediction), 1868)
+})
+
+o <- suppressWarnings(predictRandomEffects(VolumeTaper::exampleRandomEffectPrediction))
+test_that("Testing nb species in blups list", {
+  expect_equal(length(o), 4)
+})
+
