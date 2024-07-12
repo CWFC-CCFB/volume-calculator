@@ -1,3 +1,6 @@
+
+possibleProvinces <- c("AB", "BC", "MB", "ON", "QC", "SK", "YT")
+
 #'
 #' Wood volume calculation using taper models
 #'
@@ -184,6 +187,13 @@ predictRandomEffects <- function(data) {
                  "See the `exampleRandomEffectPrediction` data.frame for an example.", sep="\n"))
     }
   }
+
+  for (prov in unique(data$provinceID)) {
+    if (!(prov %in% possibleProvinces)) {
+      stop("The province ", prov, " is not recognized!\n Accepted province codes are: ", paste(possibleProvinces, collapse = ", "))
+    }
+  }
+
   screenedData <- NULL
   speciesInData <- unique(data$species_code)
   for (s in speciesInData) {
@@ -202,14 +212,19 @@ predictRandomEffects <- function(data) {
   for (s in unique(screenedData$species_code)) {
     message("Processing species ", s)
     data.s <- screenedData[which(screenedData$species_code == s),]
-    data.s <- data.s[order(data.s$provinceID, data.s$plotID, data.s$treeID),]
+    data.s <- data.s[order(data.s$provinceID, data.s$plotID, data.s$treeID, data.s$h),]
+    otherParms <- VolumeTaper::OtherParmsHObs
+    otherParms <- as.data.frame(otherParms[which(otherParms$species_code == s),])
+#    print(otherParms)
     species.blups <- NULL
+    first <- F # change to true to have the first rMat and zGzt matrices displayed
     for (p in unique(data.s$plotID)) {
-#      message("Plot",p)
       data.ps <- data.s[which(data.s$plotID == p),]
+      data.ps <- as.data.frame(data.ps)
+      treeList <- unique(data.ps$treeID)
       zList <- list()
       zList[["plot"]] <- constructZMatrix(data.ps, unique(data.ps$plotID), data.ps$plotID, data.ps[1,]$stddev_idPlot_b + data.ps[1,]$stddev_prov_b)
-      zList[["tree"]] <- constructZMatrix(data.ps, unique(data.ps$treeID), data.ps$treeID, data.ps[1,]$stddev_idtree_b)
+      zList[["tree"]] <- constructZMatrix(data.ps, treeList, data.ps$treeID, data.ps[1,]$stddev_idtree_b)
       variances <- c(data.s[1,]$stddev_idPlot_b^2 + data.ps[1,]$stddev_prov_b^2, data.s[1,]$stddev_idtree_b^2)
       levels <- c("plot", "tree")
 
@@ -226,9 +241,20 @@ predictRandomEffects <- function(data) {
       zMat <- cbind(zList[["plot"]], zList[["tree"]])
       gMat <- diag(gMat, ncol = length(gMat), nrow = length(gMat))
 
-      rMat <- diag(data.s[1,]$stddev_residual^2, ncol = nrow(data.ps), nrow = nrow(data.ps))
-
-      vMat <- zMat %*% gMat %*% t(zMat) + rMat
+      stdMat <- createStdMatrix(otherParms, data.ps, treeList)
+      corrMat <- createCorrMatrix(otherParms, data.ps, treeList)
+      rMat <- stdMat %*% corrMat %*% stdMat
+      if (first) {
+        message("rMat")
+        print(rMat)
+      }
+      zGzt <- zMat %*% gMat %*% t(zMat)
+      if (first) {
+        message("zGzt")
+        print(zGzt)
+      }
+      first <- F
+      vMat <- zGzt + rMat
       invV <- solve(vMat)
       r <- data.ps$d_cm^2 - data.ps$Dob2P0
       blups <- gMat %*% t(zMat) %*% invV %*% r
@@ -239,6 +265,80 @@ predictRandomEffects <- function(data) {
   }
 
   return(outputList)
+}
+
+
+
+#
+# Private function to produce the correlation part of the R matrix
+# @param otherParms the other parameter estimates for observed height models
+# @param data the data to be processed
+# @param a vector containing the individual tree id
+#
+createCorrMatrix <- function(otherParms, data, treeList) {
+  if (is.na(otherParms$movaverage)) {
+    corrFunctionType <- "CAR1"   # continuous first-order autoregressive structure
+  } else {
+    corrFunctionType <- "ARMA11" # ARMA structure
+  }
+
+  corrMatrix <- matrix(0, ncol = nrow(data), nrow = nrow(data))
+  for (t in treeList) {
+    index <- which(data$treeID == t)
+    nObs <- length(index)
+    if (corrFunctionType == "CAR1") {
+      distancesM <- data[index,]$h
+      dMat <- matrix(distancesM, nrow = nObs, ncol = nObs)
+      dMat <- abs(dMat - t(dMat))
+      corrMatrix[index, index] <- otherParms$corr^dMat
+    } else {
+      distancesM <- index
+      dMat <- matrix(distancesM, nrow = nObs, ncol = nObs)
+      dMat <- abs(dMat - t(dMat)) - 1
+      diag(dMat) <- 0
+      ar1Part <- otherParms$corr^dMat
+      ma1Part <- matrix(otherParms$movaverage, nrow = nObs, ncol = nObs)
+      diag(ma1Part) <- 1
+      corrMatrix[index, index] <- ma1Part * ar1Part
+    }
+  }
+  return(corrMatrix)
+}
+
+
+
+#
+# Private function to produce the std part of the R matrix
+# @param otherParms the other parameter estimates for observed height models
+# @param data the data to be processed
+# @param a vector containing the individual tree id
+#
+createStdMatrix <- function(otherParms, data, treeList) {
+  varianceFunctionType <- otherParms$varFunc
+  if (!is.na(otherParms$all)) {
+    varParm <- otherParms$all
+  } else {
+    provID <- data[1,"provinceID"]
+    if (!(provID %in% possibleProvinces)) {
+      stop("The province id ", provID, " does not have a variance parameter!")
+    }
+    varParm <- otherParms[,provID]
+    if (is.na(varParm)) {
+      stop("The variance parameter for province ", provID, " is not available!")
+    }
+  }
+  stdVect <- rep(0,nrow(data))
+  for (t in treeList) {
+    index <- which(data$treeID == t)
+    if (varianceFunctionType == "Power") {
+      covar <- data[index,]$dbh_cm  ### MF20240712 Presumably this is the good covariate. According to Jing's email this might vary across the species.
+      stdVect[index] <- otherParms$std_res * covar ^ varParm
+    } else if (varianceFunctionType == "Exp") {
+      covar <- data[index,]$dbh_cm
+      stdVect[index] <- otherParms$std_res * exp(covar * varParm)
+    }
+  }
+  return(diag(stdVect))
 }
 
 
