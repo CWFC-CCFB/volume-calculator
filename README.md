@@ -1,4 +1,5 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![R-CMD-check](https://github.com/CWFC-CCFB/volume-calculator/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CWFC-CCFB/volume-calculator/actions/workflows/R-CMD-check.yaml)
 
 The VolumeTaper package
 =======================
