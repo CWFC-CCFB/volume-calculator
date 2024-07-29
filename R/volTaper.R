@@ -53,9 +53,13 @@ volTaper <- function(data, forceHeightEstimation = FALSE, limit.dob = NULL, limi
   df2[, dob2P_top:= data.table::shift(dob2P), by = .(species_code, treeID)]
   df2[, h_top:= data.table::shift(h), by = .(species_code, treeID)]
   # h criteria
-  if(!(is.null(limit.height))) df2 <- df2[h_top <= limit.height]
+  if(!(is.null(limit.height))) {
+    df2 <- df2[h_top <= limit.height]
+  }
   # dob criteria
-  if(!is.null(limit.dob)) df2 <- df2[dob2P_top >= limit.dob^2]
+  if(!is.null(limit.dob)) {
+    df2 <- df2[dob2P_top >= limit.dob^2]
+  }
 
   df2 <- df2[!is.na(dob2P_top)]
   df2[, Vi := (dob2P + dob2P_top)*0.1*pi/80000] # 0.1 is the section length
@@ -175,10 +179,13 @@ seq_a <- function(ifirst, ilast, iby){
 #' Predict the random effects
 #'
 #' @param data a data.frame object properly formatted
+#' @param produceEnhancedPred a logical if true a data.frame with enhanced predictions is
+#' added to the returned list
+#' @return a list with the blups
 #'
 #' @export
 #'
-predictRandomEffects <- function(data) {
+predictRandomEffects <- function(data, produceEnhancedPred = F) {
   requiredFields <- colnames(VolumeTaper::exampleRandomEffectPrediction)
   for (f in requiredFields) {
     if (!(f %in% colnames(data))) {
@@ -208,14 +215,15 @@ predictRandomEffects <- function(data) {
   parms <- o$parms
   screenedData <- o$data
   screenedData <- getConditionalSquaredDiameterOverBarkCm2(screenedData, parms, includeFirstDerivative = T)
+
   outputList <- list()
+  enhancedPredictions <- NULL
   for (s in unique(screenedData$species_code)) {
     message("Processing species ", s)
     data.s <- screenedData[which(screenedData$species_code == s),]
     data.s <- data.s[order(data.s$provinceID, data.s$plotID, data.s$treeID, data.s$h),]
     otherParms <- VolumeTaper::OtherParmsHObs
     otherParms <- as.data.frame(otherParms[which(otherParms$species_code == s),])
-#    print(otherParms)
     species.blups <- NULL
     first <- F # change to true to have the first rMat and zGzt matrices displayed
     for (p in unique(data.s$plotID)) {
@@ -259,11 +267,19 @@ predictRandomEffects <- function(data) {
       r <- data.ps$d_cm^2 - data.ps$Dob2P0
       blups <- gMat %*% t(zMat) %*% invV %*% r
       species.blups <- rbind(species.blups, data.frame(subject = colnames(zMat), blups))
+      if (produceEnhancedPred) {
+        enhancement <- zMat %*% blups
+        data.ps$enhancedPred <- data.ps$Dob2P0 + enhancement[,1]
+        enhancedPredictions <- rbind(enhancedPredictions, data.ps)
+      }
     }
 
     outputList[[s]] <- species.blups
   }
 
+  if (produceEnhancedPred) {
+    outputList[["enhancedPred"]] <- enhancedPredictions
+  }
   return(outputList)
 }
 

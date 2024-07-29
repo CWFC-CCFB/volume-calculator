@@ -1,6 +1,6 @@
 Package: VolumeTaper
 Title: Wood volume calculation using taper models
-Version: 0.9.1
+Version: 0.9.2
 Authors@R: c(person("Xiao Jing", "Guo", , "xiaojing.guo@NRCan-RNCan.gc.ca", role = c("aut", "cre")),
     person("Mathieu", "Fortin", email = "mathieu.fortin.re@gmail.com", role = c("ctb"), comment = c(ORCID = "0000-0002-6436-2727")),
     person("His Majesty the King in right of Canada", role=c("cph")))

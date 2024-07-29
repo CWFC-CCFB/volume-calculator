@@ -4,10 +4,16 @@
 \alias{predictRandomEffects}
 \title{Predict the random effects}
 \usage{
-predictRandomEffects(data)
+predictRandomEffects(data, produceEnhancedPred = F)
 }
 \arguments{
 \item{data}{a data.frame object properly formatted}
+
+\item{produceEnhancedPred}{a logical if true a data.frame with enhanced predictions is
+added to the returned list}
+}
+\value{
+a list with the blups
 }
 \description{
 Predict the random effects

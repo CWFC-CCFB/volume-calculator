@@ -35,7 +35,8 @@ test_that("Testing example for random effect predictions", {
   expect_equal(nrow(VolumeTaper::exampleRandomEffectPrediction), 1868)
 })
 
-o <- suppressWarnings(predictRandomEffects(VolumeTaper::exampleRandomEffectPrediction))
+o <- suppressWarnings(predictRandomEffects(VolumeTaper::exampleRandomEffectPrediction, produceEnhancedPred = T))
+#View(o$ACERSAH)
 # acerSac <- o$ACERSAH
 # hist(acerSac[which(startsWith(acerSac$subject,"tree")),"blups"])
 # mean(acerSac[which(startsWith(acerSac$subject,"tree")),"blups"]^2)^.5
@@ -50,10 +51,12 @@ o <- suppressWarnings(predictRandomEffects(VolumeTaper::exampleRandomEffectPredi
 # mean(betuall[which(startsWith(betuall$subject,"tree")),"blups"]^2)^.5
 
 test_that("Testing blups", {
-  expect_equal(length(o), 4)
+  expect_equal(length(o), 5)
   expect_equal(o$ACERSAH[1,"blups"],-0.02873648, tolerance=1e-6)
   expect_equal(o$ACERRUB[1,"blups"],0.0005296406, tolerance=1e-6)
   expect_equal(o$BETUPAP[1,"blups"],-0.08022338, tolerance=1e-6)
   expect_equal(o$BETUALL[1,"blups"],-0.07736193, tolerance=1e-6)
+  expect_equal(nrow(o$enhancedPred), 1634)
+  expect_equal(o$enhancedPred[1,"enhancedPred"], 1112.33376, tolerance=1e-5)
 })
 
